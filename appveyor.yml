@@ -1,0 +1,14 @@
+environment:
+
+  matrix:
+    - PYTHON: "C:\\Python37-x64"
+
+install:
+  - "%PYTHON%\\python.exe -m pip install --upgrade pip wheel codecov"
+  - "%PYTHON%\\python.exe -m pip install --upgrade -e .[dev]"
+  - "%PYTHON%\\python.exe setup.py build"
+
+build: off
+
+test_script:
+  - "%PYTHON%\\Scripts\\pytest.exe"

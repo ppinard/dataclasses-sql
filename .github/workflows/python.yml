@@ -11,8 +11,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: [3.7, 3.8]
+        os: [ubuntu-latest]
+        python-version: [3.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +30,9 @@ jobs:
             ${{ runner.os }}-
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
+          python -m pip install --upgrade pip codecov
           pip install --upgrade -e .[dev]
       - name: Test with pytest
         run: pytest
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1

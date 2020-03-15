@@ -2,15 +2,11 @@
 dataclasses-sql
 ===============
 
-.. image:: https://img.shields.io/pypi/v/dataclasses_sql.svg
-        :target: https://pypi.python.org/pypi/dataclasses_sql
+.. image:: https://img.shields.io/pypi/v/dataclasses-sql.svg
+        :target: https://pypi.python.org/pypi/dataclasses-sql
 
-.. image:: https://img.shields.io/travis/ppinard/dataclasses_sql.svg
-        :target: https://travis-ci.org/ppinard/dataclasses_sql
-
-.. image:: https://readthedocs.org/projects/dataclasses-sql/badge/?version=latest
-        :target: https://dataclasses-sql.readthedocs.io/en/latest/?badge=latest
-        :alt: Documentation Status
+.. image:: https://img.shields.io/travis/ppinard/dataclasses-sql.svg
+        :target: https://travis-ci.org/ppinard/dataclasses-sql
 
 Using dataclasses with SQL databases.
 
@@ -18,7 +14,7 @@ Examples::
 
     import dataclasses
     import sqlalchemy
-    import sqlalchemy_dataclasses.sql as sql
+    import dataclasses_sql
 
     @dataclasses.dataclass
     class Car:
@@ -29,14 +25,24 @@ Examples::
     # Connect to database
     engine = sqlalchemy.create_engine("sqlite:///:memory:")
     metadata = sqlalchemy.MetaData(engine)
+    metadata.reflect()
 
-    # Create table
-    table = sql.require_table(metadata, Car)
-    print(table.columns)
-
-    # Insert data
+    # Insert
     car = Car("Kia", "Ceed", 15678)
-    sql.insert(metdata, car, check_exists=True)
+    dataclasses_sql.insert(metadata, car, check_exists=True)
+
+    car = Car("Ford", "Mustang", 4032)
+    dataclasses_sql.insert(metadata, car, check_exists=True)
+
+    # Select
+    builder = dataclasses_sql.SelectStatementBuilder()
+    builder.add_column(Car, "mileage"
+    builder.add_clause(Car, "brand", "Kia")
+    statement = builder.build()
+
+    with metadata.bind.begin() as conn:
+        row = conn.execute(statement).fetchone()
+        print(row)
 
 Installation
 ============
@@ -47,7 +53,7 @@ Easiest way to install using ``pip``::
 
 For development installation from the git repository::
 
-    git clone git@github.com/ppinard/dataclasses_sql.git
+    git clone git@github.com/ppinard/dataclasses-sql.git
     cd dataclasses_sql
     pip install -e .
 

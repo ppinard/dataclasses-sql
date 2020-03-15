@@ -15,8 +15,7 @@ from data import TreeData, TaxonomyData
 
 @pytest.fixture
 def metadata(treedata):
-    # engine = sqlalchemy.create_engine("sqlite:///:memory:")
-    engine = sqlalchemy.create_engine("sqlite:////tmp/test.db")
+    engine = sqlalchemy.create_engine("sqlite:///:memory:")
     metadata = sqlalchemy.MetaData(engine)
     metadata.reflect()
 

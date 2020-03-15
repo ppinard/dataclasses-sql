@@ -33,8 +33,11 @@ def _check_column_exists(dataclass, column_name):
 
 
 def _create_sqlcolumn(dataclass, column_name):
-    table_name = get_table_name(dataclass)
-    return sqlalchemy.sql.literal_column(f'"{table_name}"."{column_name}"')
+    if dataclass is None:
+        return sqlalchemy.sql.literal_column(column_name)
+    else:
+        table_name = get_table_name(dataclass)
+        return sqlalchemy.sql.literal_column(f"{table_name}.{column_name}")
 
 
 @dataclasses.dataclass
@@ -148,6 +151,8 @@ class SelectStatementBuilder:
         # Create columns
         sqlcolumns = []
         for dataclass, column_name in self._columns:
+            if len(self._tables) == 1:
+                dataclass = None
             sqlcolumns.append(_create_sqlcolumn(dataclass, column_name))
 
         # Create statement

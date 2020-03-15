@@ -116,6 +116,18 @@ def test_select(metadata):
     assert len(rows) == 2
 
 
+def test_select_with_label(metadata):
+    builder = dataclasses_sql.SelectStatementBuilder()
+    builder.add_column(TaxonomyData, "order", label="foo")
+    statement = builder.build()
+
+    with metadata.bind.begin() as conn:
+        rows = conn.execute(statement).fetchall()
+
+    assert len(rows) == 2
+    assert "foo" in rows[0].keys()
+
+
 def test_select_with_join(metadata):
     builder = dataclasses_sql.SelectStatementBuilder()
     builder.add_column(TreeData, "specie")

@@ -49,13 +49,13 @@ class SelectStatementBuilder:
         self._joins = {}
         self._clauses = []
 
-    def add_column(self, dataclass, column_name, alias=None):
+    def add_column(self, dataclass, column_name, label=None):
         # Check column exist
         _check_column_exists(dataclass, column_name)
 
         # Add column
         self._tables.add(dataclass)
-        self._columns.append((dataclass, column_name, alias))
+        self._columns.append((dataclass, column_name, label))
 
     def add_all_columns(self, dataclass):
         # Add table
@@ -152,12 +152,12 @@ class SelectStatementBuilder:
 
         # Create columns
         sqlcolumns = []
-        for dataclass, column_name, alias in self._columns:
+        for dataclass, column_name, label in self._columns:
             sqltable = sqltables[dataclass]
             sqlcolumn = sqlalchemy.sql.column(column_name, _selectable=sqltable)
 
-            if alias is not None:
-                sqlcolumn = sqlcolumn.label(alias)
+            if label is not None:
+                sqlcolumn = sqlcolumn.label(label)
 
             sqlcolumns.append(sqlcolumn)
 

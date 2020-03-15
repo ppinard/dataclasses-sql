@@ -47,6 +47,7 @@ setup(
     ],
     description="Using dataclasses with SQL databases.",
     long_description=LONG_DESCRIPTION,
+    long_description_content_type="text/markdown",
     license="MIT license",
     packages=PACKAGES,
     include_package_data=True,

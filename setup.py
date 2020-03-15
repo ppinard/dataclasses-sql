@@ -15,7 +15,7 @@ import versioneer
 logger = logging.getLogger(__name__)
 BASEDIR = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(BASEDIR, "README.rst"), "r") as fp:
+with open(os.path.join(BASEDIR, "README.md"), "r") as fp:
     LONG_DESCRIPTION = fp.read()
 
 PACKAGES = find_packages()

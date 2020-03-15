@@ -32,14 +32,6 @@ def _check_column_exists(dataclass, column_name):
         raise ValueError(f"Dataclass {dataclass.__name__} has no column {column_name}")
 
 
-def _create_sqlcolumn(dataclass, column_name):
-    if dataclass is None:
-        return sqlalchemy.sql.literal_column(column_name)
-    else:
-        table_name = get_table_name(dataclass)
-        return sqlalchemy.sql.literal_column(f"{table_name}.{column_name}")
-
-
 @dataclasses.dataclass
 class _Clause:
     dataclass: dataclasses.dataclass
@@ -57,27 +49,27 @@ class SelectStatementBuilder:
         self._joins = {}
         self._clauses = []
 
-    def add_column(self, dataclass, column_name):
+    def add_column(self, dataclass, column_name, alias=None):
         # Check column exist
         _check_column_exists(dataclass, column_name)
 
         # Add column
         self._tables.add(dataclass)
-        self._columns.append((dataclass, column_name))
+        self._columns.append((dataclass, column_name, alias))
 
     def add_all_columns(self, dataclass):
         # Add table
         self._tables.add(dataclass)
 
         # Add id column
-        self._columns.append((dataclass, "id"))
+        self._columns.append((dataclass, "id", None))
 
         # Add column for each field
         for field in dataclasses.fields(dataclass):
             if dataclasses.is_dataclass(field.type):
-                self._columns.append((dataclass, f"{field.name}_id"))
+                self._columns.append((dataclass, f"{field.name}_id", None))
             else:
-                self._columns.append((dataclass, field.name))
+                self._columns.append((dataclass, field.name, None))
 
     def add_join(
         self,
@@ -107,6 +99,9 @@ class SelectStatementBuilder:
         else:
             _check_column_exists(dataclass_left, column_name_left)
 
+        # Add
+        self._tables.add(dataclass_left)
+        self._tables.add(dataclass_right)
         self._joins[(dataclass_left, dataclass_right)] = (
             column_name_left,
             column_name_right,
@@ -148,17 +143,28 @@ class SelectStatementBuilder:
         if not self._tables:
             raise ValueError("No table in select")
 
+        # Create table lookup
+        sqltables = {}
+        for dataclass in self._tables:
+            table_name = get_table_name(dataclass)
+            sqltable = sqlalchemy.sql.table(table_name)
+            sqltables[dataclass] = sqltable
+
         # Create columns
         sqlcolumns = []
-        for dataclass, column_name in self._columns:
-            if len(self._tables) == 1:
-                dataclass = None
-            sqlcolumns.append(_create_sqlcolumn(dataclass, column_name))
+        for dataclass, column_name, alias in self._columns:
+            sqltable = sqltables[dataclass]
+            sqlcolumn = sqlalchemy.sql.column(column_name, _selectable=sqltable)
+
+            if alias is not None:
+                sqlcolumn = sqlcolumn.label(alias)
+
+            sqlcolumns.append(sqlcolumn)
 
         # Create statement
         statement = sqlalchemy.sql.select(sqlcolumns, distinct=self.distinct)
 
-        # Add select from
+        # Add join
         if self._joins:
             # Create SQL joins
             sqljoins = []
@@ -167,14 +173,15 @@ class SelectStatementBuilder:
                 (dataclass_left, dataclass_right),
                 (column_name_left, column_name_right, outer),
             ) in self._joins.items():
-                table_name_left = get_table_name(dataclass_left)
-                sqltable_left = sqlalchemy.sql.table(table_name_left)
+                sqltable_left = sqltables[dataclass_left]
+                sqltable_right = sqltables[dataclass_right]
 
-                table_name_right = get_table_name(dataclass_right)
-                sqltable_right = sqlalchemy.sql.table(table_name_right)
-
-                sqlcolumn_left = _create_sqlcolumn(dataclass_left, column_name_left)
-                sqlcolumn_right = _create_sqlcolumn(dataclass_right, column_name_right)
+                sqlcolumn_left = sqlalchemy.sql.column(
+                    column_name_left, _selectable=sqltable_left
+                )
+                sqlcolumn_right = sqlalchemy.sql.column(
+                    column_name_right, _selectable=sqltable_right
+                )
 
                 onclause = sqlcolumn_left == sqlcolumn_right
                 sqljoins.append((sqltable_left, sqltable_right, onclause, outer))
@@ -201,19 +208,16 @@ class SelectStatementBuilder:
 
             statement = statement.select_from(finaljoin)
 
-        else:
-            for dataclass in self._tables:
-                table_name = get_table_name(dataclass)
-                sqltable = sqlalchemy.sql.table(table_name)
-                statement = statement.select_from(sqltable)
-
         # Create clauses
         sqlclauses = []
         for clauses_or in self._clauses:
             sqlclauses_or = []
             for clause in clauses_or:
-                column = _create_sqlcolumn(clause.dataclass, clause.column_name)
-                sqlclause = _OPERATION_LOOKUP[clause.operation](column, clause.value)
+                sqltable = sqltables[clause.dataclass]
+                sqlcolumn = sqlalchemy.sql.column(
+                    clause.column_name, _selectable=sqltable
+                )
+                sqlclause = _OPERATION_LOOKUP[clause.operation](sqlcolumn, clause.value)
                 sqlclauses_or.append(sqlclause)
 
             sqlclauses.append(sqlalchemy.sql.or_(*sqlclauses_or))

@@ -135,9 +135,6 @@ class SelectStatementBuilder:
 
         return _Clause(dataclass, column_name, value, operation)
 
-    def add_clauses(self, clause):
-        pass
-
     def build(self):
         # Checks
         if not self._tables:

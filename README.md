@@ -31,7 +31,7 @@ dataclasses_sql.insert(metadata, car, check_exists=True)
 
 # Select
 builder = dataclasses_sql.SelectStatementBuilder()
-builder.add_column(Car, "mileage"
+builder.add_column(Car, "mileage")
 builder.add_clause(Car, "brand", "Kia")
 statement = builder.build()
 

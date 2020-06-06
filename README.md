@@ -1,6 +1,7 @@
 # dataclasses-sql
 
-[![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fppinard%2Fdataclasses-sql%2Fbadge&style=flat)](https://actions-badge.atrox.dev/ppinard/dataclasses-sql/goto)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/ppinard/dataclasses-sql/CI)
+![PyPI](https://img.shields.io/pypi/v/dataclasses-sql)
 
 Using dataclasses with SQL databases.
 

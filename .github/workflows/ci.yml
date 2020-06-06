@@ -1,4 +1,4 @@
-name: Python package
+name: CI
 
 on:
   push:
@@ -33,7 +33,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip codecov
-          pip install --upgrade -e .[dev]
+          pip install -r requirements-test.txt
+          pip install --upgrade -e .
       - name: Test with pytest
         run: pytest
       - name: Upload coverage to Codecov

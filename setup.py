@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 # Standard library modules.
-import os
-import sys
-import logging
+from pathlib import Path
 
 # Third party modules.
 from setuptools import setup, find_packages
@@ -12,20 +10,21 @@ from setuptools import setup, find_packages
 import versioneer
 
 # Globals and constants variables.
-logger = logging.getLogger(__name__)
-BASEDIR = os.path.abspath(os.path.dirname(__file__))
+BASEDIR = Path(__file__).parent.resolve()
 
-with open(os.path.join(BASEDIR, "README.md"), "r") as fp:
+with open(BASEDIR.joinpath("README.md"), "r") as fp:
     LONG_DESCRIPTION = fp.read()
 
 PACKAGES = find_packages()
 
-with open(os.path.join(BASEDIR, "requirements.txt"), "r") as fp:
+with open(BASEDIR.joinpath("requirements.txt"), "r") as fp:
     INSTALL_REQUIRES = fp.read().splitlines()
 
 EXTRAS_REQUIRE = {}
-with open(os.path.join(BASEDIR, "requirements_dev.txt"), "r") as fp:
+with open(BASEDIR.joinpath("requirements-dev.txt"), "r") as fp:
     EXTRAS_REQUIRE["dev"] = fp.read().splitlines()
+with open(BASEDIR.joinpath("requirements-test.txt"), "r") as fp:
+    EXTRAS_REQUIRE["test"] = fp.read().splitlines()
 
 CMDCLASS = versioneer.get_cmdclass()
 
@@ -34,7 +33,7 @@ ENTRY_POINTS = {}
 setup(
     name="dataclasses-sql",
     version=versioneer.get_version(),
-    url="https://github.com/ppinard/dataclasses_sql",
+    url="https://github.com/ppinard/dataclasses-sql",
     author="Philippe Pinard",
     author_email="philippe.pinard@gmail.com",
     classifiers=[

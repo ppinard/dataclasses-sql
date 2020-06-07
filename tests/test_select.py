@@ -8,7 +8,7 @@ import sqlalchemy
 
 # Local modules.
 import dataclasses_sql
-from data import TreeData, TaxonomyData
+from .data import TreeData, TaxonomyData
 
 # Globals and constants variables.
 

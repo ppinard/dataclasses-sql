@@ -7,8 +7,8 @@ import dataclasses
 import pytest
 
 # Local modules.
-from dataclasses_sql.utils import iskeyfield, keyfields
-from data import TaxonomyData, TreeData
+from dataclasses_sql.base import iskeyfield, keyfields
+from .data import TaxonomyData, TreeData
 
 # Globals and constants variables.
 

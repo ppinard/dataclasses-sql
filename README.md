@@ -59,7 +59,9 @@ pip install -e .
 
 ## Release notes
 
-### 0.1.0
+### 0.2
+
+* Add update function
 
 
 ## Contributors

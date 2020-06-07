@@ -1,14 +1,13 @@
 """"""
 
 # Standard library modules.
-import dataclasses
 import datetime
 
 # Third party modules.
 import pytest
 
 # Local modules.
-from data import TaxonomyData, TreeData
+from .data import TaxonomyData, TreeData
 
 # Globals and constants variables.
 

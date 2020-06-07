@@ -1,7 +1,6 @@
 """"""
 
 # Standard library modules.
-import dataclasses
 
 # Third party modules.
 import pytest
@@ -55,15 +54,18 @@ def test_insert(metadata, treedata):
     assert row["genus"] == "hibiscus"
 
 
-def test_insert_check_exists(metadata, treedata):
+def test_insert_check_exists_using_rowid(metadata, treedata):
     success = dataclasses_sql.insert(metadata, treedata)
     assert success
 
-    # Check using _row_id
     success = dataclasses_sql.insert(metadata, treedata)
     assert not success
 
-    # Check using database
+
+def test_insert_check_exists_using_database(metadata, treedata):
+    success = dataclasses_sql.insert(metadata, treedata)
+    assert success
+
     del treedata._rowid
     del treedata.taxonomy._rowid
     success = dataclasses_sql.insert(metadata, treedata)

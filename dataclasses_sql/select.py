@@ -9,7 +9,7 @@ import typing
 import sqlalchemy.sql
 
 # Local modules.
-from .utils import get_table_name
+from .base import get_table_name
 
 # Globals and constants variables.
 _OPERATION_LOOKUP = {

@@ -35,7 +35,7 @@ def update(metadata, data):
         else:
             row[name] = value
 
-    # Insert
+    # Update
     table = require_table(metadata, data)
 
     with metadata.bind.begin() as conn:

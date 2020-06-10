@@ -59,6 +59,10 @@ pip install -e .
 
 ## Release notes
 
+### 0.3
+
+* Add delete function
+
 ### 0.2
 
 * Add update function
